@@ -1,0 +1,270 @@
+.tokenomics-section{
+    padding:80px 0;
+    background-color: #f5f5f7;
+}
+
+.tokenomics-section .container{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 48px;
+}
+
+.container .left-container{
+  width: calc(50% - 24px);
+  height: 100%;
+  margin: auto 0;
+}
+
+.container .right-container{
+  width: calc(50% - 24px);
+}
+
+.tokenomics-section h2{
+    text-align: center;
+    font-size: 36px;
+    font-weight: 700;
+    font-family: "Orbitron";
+    line-height: 40px;
+    margin-bottom: 48px;
+    width: 100%;
+}
+
+.tokenomics-section .container{
+  max-width: 1152px;  
+  margin: 0 auto;
+}
+
+.tokenomics-section .container .left-container .content h3{
+  font-size: 30px;
+  margin-bottom: 8px;
+  font-family: Orbitron, sans-serif;
+}
+
+.tokenomics-section .container .left-container .content .one{
+  color: rgb(142 145 150);
+  font-size: 18px;
+  margin-bottom: 24px;
+}
+
+.tokenomics-section .container .left-container .content .two{
+  font-size: 64px;
+  font-weight: 700;
+}
+
+.tokenomics-section .container .left-container .content hr{
+  width: 74px;
+  margin-bottom: 8px;
+  background-color: black;
+  height: 1px;
+}
+
+.tokenomics-section .container .left-container .content .three{
+  font-size: 20px;
+  font-weight: 300;
+  margin-bottom: 32px;
+}
+
+.tokenomics-section .container .left-container .content .table-container{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tokenomics-section .container .left-container .content .table-container .line{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.tokenomics-section .container .left-container .content .table-container .line .left{
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.tokenomics-section .container .left-container .content .table-container .line .right{
+  font-weight: 700;
+  font-family: Orbitron, sans-serif;
+  font-size: 16px;
+}
+
+/* Стили для диограммы */
+
+.custom-tooltip {
+  position: fixed;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 12px 16px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 14px;
+  z-index: 100;
+  opacity: 0;
+  transition: opacity 0.2s, transform 0.2s;
+  pointer-events: none;
+  min-width: 180px;
+  border: 1px solid #eee;
+  transform-origin: center;
+}
+
+.tooltip-title, .tooltip-percentage, .tooltip-tokens {
+  transition: all 0.15s ease-out;
+}
+
+.custom-tooltip.updating .tooltip-title,
+.custom-tooltip.updating .tooltip-percentage,
+.custom-tooltip.updating .tooltip-tokens {
+  opacity: 0;
+  transform: translateY(-5px);
+}
+
+.custom-tooltip.updated .tooltip-title,
+.custom-tooltip.updated .tooltip-percentage,
+.custom-tooltip.updated .tooltip-tokens {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tooltip-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 13px;
+  color: #000; 
+}
+
+.tooltip-data {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.tooltip-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tooltip-label {
+  font-weight: 500;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.7);
+  text-transform: lowercase;
+}
+
+.tooltip-value {
+  font-weight: 700;
+  font-size: 13px;
+  color: #000;
+}
+
+.tooltip-percentage {
+  color: #000; 
+}
+
+
+.container .right-container .table-container-two{
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  max-width: 448px;
+  margin: 0 auto;
+  margin-top: 20px;
+}
+
+.container .right-container .table-container-two .line{
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+}
+
+.container .right-container .table-container-two .line .left{
+  font-size: 14px;
+  letter-spacing: -0.35px;
+  font-weight: 700;
+  font-family: Orbitron, sans-serif;
+}
+
+.container .right-container .table-container-two .line .right-column p{
+  font-size: 14px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+
+.container .right-container .table-container-two .line .right-column p span{
+  font-weight: 600;
+}
+
+.tokenomics-section .bottom-text{
+  text-align: right;
+  width: 100%;
+  padding-right: 16px;
+  max-width: 1152px;
+  margin-top: 0px;
+  color: rgb(107 114 128);
+  font-size: 12px;
+}
+
+
+.tokenomics-section svg text, svg tspan {
+    font-family: 'Orbitron', sans-serif !important;
+}
+
+
+@media (max-width: 770px) {
+  .tokenomics-section .container {
+    flex-direction: column;
+    gap: 32px;
+  }
+  
+  .container .left-container,
+  .container .right-container {
+    width: 100%;
+  }
+  
+  .tokenomics-section .container .left-container .content {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .tokenomics-section .container .left-container .content h3,
+  .tokenomics-section .container .left-container .content .one,
+  .tokenomics-section .container .left-container .content .two,
+  .tokenomics-section .container .left-container .content hr,
+  .tokenomics-section .container .left-container .content .three {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+  }
+  
+  .tokenomics-section .container .left-container .content hr {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .tokenomics-section .container .left-container .content .table-container {
+    justify-content: center;
+    margin-top: 24px;
+  }
+  
+  .recharts-surface {
+    width: 100% !important;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  .container .right-container .table-container-two {
+    max-width: 100%;
+    margin-top: 32px;
+  }
+  
+  .tokenomics-section .bottom-text {
+    text-align: center;
+    padding-right: 0;
+    margin-top: 24px;
+  }
+}

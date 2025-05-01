@@ -1,0 +1,111 @@
+header{
+    position: fixed;
+    width: 100%;
+    left: 0;
+    top: 0;
+    padding: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 88px;
+    transition: all 0.6s;
+}
+
+header.post{
+    backdrop-filter: blur(4px);
+    box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    background-color: #ffffffe6;
+}
+
+header .container{
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+}
+
+header .container .logo{
+    display: flex;
+    text-decoration: none;
+    color: black;
+    align-items: center;
+    height: 56px;
+}
+
+header .container .logo img{
+    width: 48px;
+    height: 48px;
+    margin-right: 16px;
+}
+
+header .container .logo .text{
+    display: flex;
+    flex-wrap: wrap;
+    height: 100%;
+}
+
+header .container .logo .text .windows{
+    width: 100%;
+    font-size: 20px;
+    font-weight: 700;
+    line-height:28px;
+    font-family: "Orbitron";
+    line-height: 28px;
+}
+
+header .container .logo .text .one{
+    font-size: 18px;
+    font-weight: 100;
+    font-family: "Orbitron";
+    color: #000000b3;
+    line-height: 28px;
+}
+
+.nav-menu {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    height: 100%;
+    align-items: center;
+}
+  
+.nav-menu a {
+    text-decoration: none;
+    color: #000000b3;
+    margin: 0 0px;
+    font-size: 100%;
+    gap: 8px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    margin-left: 32px;
+    height: 24px;
+    transition: color 0.3s ease;
+}
+
+.nav-menu a svg {
+    display: block;
+    vertical-align: middle;
+    transition: stroke 0.3s ease; 
+}
+
+.nav-menu a:hover {
+    color: #000; 
+}
+
+.nav-menu a:hover svg {
+    stroke: #000;
+}
+
+@media(min-width: 1400px){
+    header .container{
+        max-width: 1400px;
+    }
+}
+
+@media(max-width: 470px){
+    header{
+        display: none;
+    }
+}

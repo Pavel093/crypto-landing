@@ -1,0 +1,163 @@
+.roadmap-section {
+    padding-top: 96px;
+    padding-bottom: 96px;
+}
+
+.roadmap-section .container {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 1400px;
+    gap: 32px;
+    margin: 0 auto;
+}
+
+.roadmap-section .container .card {
+    flex: 0 0 calc(33.333% - (32px * 2 / 3)); 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-width: 250px;
+    box-sizing: border-box;
+}
+
+.roadmap-section .container .card:last-child {
+    margin-right: auto;
+}
+
+.roadmap-section .container h2 {
+    text-align: center;
+    font-size: 48px;
+    font-weight: 700;
+    font-family: "Orbitron";
+    line-height: 40px;
+    margin-bottom: 80px;
+    width: 100%;
+    letter-spacing: -1.2px;
+}
+
+.roadmap-section .container .card .image,
+.roadmap-section .container .card .data,
+.roadmap-section .container .card h3,
+.roadmap-section .container .card p {
+    display: block;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.roadmap-section .container .card .image {
+    width: 80px;
+    height: 80px;
+    border: 2px black solid;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 100px;
+    position: relative;
+    transition: all 0.4s;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -2px rgba(0, 0, 0, 0.1);
+}
+
+.roadmap-section .container .card .image .post-svg {
+    position: absolute;
+    right: -9px;
+    bottom: 5px;
+    background-color: black;
+    width: 24px;
+    height: 24px;
+    border-radius: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.roadmap-section .container .card .image .post-svg svg {
+    stroke: white;
+}
+
+.roadmap-section .container .card .data {
+    padding: 4px 16px;
+    border-radius: 50px;
+    font-family: "Orbitron";
+    width: max-content;
+    font-size: 12px;
+    box-shadow: 
+        0 1px 3px 0 rgba(0, 0, 0, 0.1),
+        0 1px 2px -1px rgba(0, 0, 0, 0.1);
+}
+
+.roadmap-section .container .card h3 {
+    letter-spacing: 1.4px;
+    text-transform: uppercase;
+    font-size: 14px;
+    font-family: Orbitron, sans-serif;
+    margin-bottom: 4px;
+    font-weight: 300;
+}
+
+.roadmap-section .container .card p {
+    color: #000000b3;
+    font-weight: 300;
+    font-size: 14px;
+    width: 60%;
+    max-width: 200px;
+}
+
+.roadmap-section .container .card:hover .image {
+    transform: translateY(-7px);
+    box-shadow: 
+        0 8px 12px -2px rgba(0, 0, 0, 0.15),
+        0 4px 6px -4px rgba(0, 0, 0, 0.15);
+}
+
+.roadmap-section .container .card .image {
+    position: relative;
+}
+
+.roadmap-section .container .card:hover .image::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    border: 2px dashed  black;
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+@media (max-width: 470px) {
+    .roadmap-section .container {
+        gap: 25px;
+    }
+
+    .roadmap-section .container .card{
+        padding: 24px 16px;
+        flex: none;
+        width: 81%;
+        margin: 0 auto;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 24px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    }
+
+    .roadmap-section .container .card .image{
+        width: 56px;
+        height: 56px;
+    }
+
+    .roadmap-section .container .card p{
+        font-size: 13px;
+        margin-bottom: 0;
+        letter-spacing: 0.2px;
+        line-height: 20px;
+    }
+
+    .roadmap-section .container .card h3{
+        font-size: 16px;
+        font-weight: 500;
+        letter-spacing: 0.2px;
+    }
+}

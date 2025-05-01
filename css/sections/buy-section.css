@@ -1,0 +1,47 @@
+.buy-section{
+    padding: 64px 0;
+    border-bottom: rgb(229, 231, 235) 1px solid;
+    text-align: center;
+}
+
+.buy-section h2{
+    text-align: center;
+    font-size: 36px;
+    font-weight: 700;
+    font-family: "Orbitron";
+    line-height: 40px;
+    margin-bottom: 48px;
+    width: 100%;
+}
+
+.buy-section p{
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 20px;
+    line-height: 28px;
+    text-align: center;
+    margin-bottom: 40px;
+    max-width: 747px;
+    margin: 0 auto;
+    margin-bottom: 40px;
+}
+
+.buy-section a{
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 28px;
+    box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    text-decoration: none;
+    color: white;
+    background-color: black;
+    border-radius: 2px;
+    padding: 11px 15px;
+    border-radius: 4px;
+}
+
+.buy-section a:hover{
+    background-color: white;
+    color: black;
+    border: 1px solid black;
+}

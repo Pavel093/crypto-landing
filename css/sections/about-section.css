@@ -1,0 +1,67 @@
+.about-section{
+    padding: 80px 0;
+}
+
+.about-section h2{
+    text-align: center;
+    font-size: 36px;
+    font-weight: 700;
+    font-family: "Orbitron";
+    line-height: 40px;
+    margin-bottom: 32px;
+}
+
+.about-section .container{
+    box-shadow: 
+        0 10px 15px -3px rgba(0, 0, 0, 0.1),
+        0 4px 6px -4px rgba(0, 0, 0, 0.1);
+    max-width: 896px;
+    margin: 0  auto;
+    padding: 32px;
+    border: 1px solid #0000001a;
+    border-radius: 8px;
+    text-align: center;
+    line-height: 22px;
+}
+
+.about-section .container .one-text{
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 300;
+    font-style: italic;
+    margin-bottom: 24px;
+}
+
+.about-section .container .two-text{
+    color: #000c;
+    font-size: 16px;
+}
+
+.about-section .container .three-text{
+    margin-top: 16px;
+    color: #000c;
+}
+
+.about-section .container .four-text{
+    line-height: 25px;
+    font-size: 14px;
+    margin-top: 16px;
+    color: #0009;
+}
+
+@media (max-width: 470px) {
+    .about-section .container{
+        width: 92%;
+        gap: 0;
+        line-height: 28px;
+        text-align: center;
+    }
+
+    .about-section .container .one-text{
+        font-size: 20px;
+    }
+
+    .about-section .container .four-text{
+        width: 100%;
+    }
+}
