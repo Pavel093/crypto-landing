@@ -1,13 +1,11 @@
+// SPA.js - полностью переработанная версия
 class SPARouter {
   constructor() {
     this.appContainer = document.getElementById('app') || document.body;
     this.scrollHistory = {};
     this.currentPath = window.location.pathname;
+    this.router = new Navigo('/', { noMatchWarning: true });
     this.isInitialized = false;
-    this.basePath = window.location.hostname === '' ? '' : '/'; // Для file:// протокола
-
-    // Инициализация Navigo с учетом локального запуска
-    this.router = new Navigo(this.basePath, { noMatchWarning: true, hash: window.location.protocol === 'file:' });
 
     this.init();
   }
@@ -16,79 +14,109 @@ class SPARouter {
     if (this.isInitialized) return;
     this.isInitialized = true;
 
+    // Сохраняем начальный скролл
     this.scrollHistory[this.currentPath] = window.scrollY;
 
     // Настройка маршрутов
     this.router.on({
       '/': () => this.loadPage('index.html'),
       '/info.html': () => this.loadPage('info.html'),
-      '*': () => this.handleNotFound()
     });
 
+    // Обработчики событий
     this.setupEventListeners();
     this.router.resolve();
   }
 
   async loadPage(pagePath) {
+    // Сохраняем текущий скролл
     this.scrollHistory[this.currentPath] = window.scrollY;
 
-    // Нормализация пути для file:// протокола
-    const normalizedPath = window.location.protocol === 'file:' ? 
-      (pagePath.startsWith('/') ? pagePath.substring(1) : pagePath) : 
-      pagePath;
-
     try {
-      const response = await fetch(normalizedPath);
-      if (!response.ok) throw new Error(`Failed to load ${normalizedPath}`);
+      const response = await fetch(pagePath);
+      if (!response.ok) throw new Error(`Failed to load ${pagePath}`);
       
       const html = await response.text();
       this.appContainer.innerHTML = html;
       this.currentPath = window.location.pathname;
 
+      // Инициализация компонентов
       this.initComponents();
       
+      // Восстановление скролла
       window.scrollTo({
         top: this.scrollHistory[this.currentPath] || 0,
         behavior: 'instant'
       });
     } catch (error) {
       console.error('Page load error:', error);
-      this.handleLoadError(error, normalizedPath);
+      this.appContainer.innerHTML = `
+        <h1>Loading Error</h1>
+        <p>${error.message}</p>
+      `;
     }
   }
 
-  handleNotFound() {
-    this.appContainer.innerHTML = `
-      <h1>Page Not Found</h1>
-      <p>The requested page was not found.</p>
-      <a href="${this.basePath}" data-router-link>Go to Home</a>
-    `;
+  initComponents() {
+    // Инициализация только если функции существуют
+    const safeInit = (fnName) => {
+      if (typeof window[fnName] === 'function') {
+        console.log(`Initializing ${fnName}`);
+        window[fnName]();
+      }
+    };
+
+    safeInit('initHeader');
+    safeInit('initTokenomics');
+    safeInit('initAccordion');
   }
 
-  handleLoadError(error, path) {
-    this.appContainer.innerHTML = `
-      <h1>Loading Error</h1>
-      <p>${error.message}</p>
-      <p>Failed to load: ${path}</p>
-      <a href="${this.basePath}" data-router-link>Go to Home</a>
-    `;
+  setupEventListeners() {
+    // Удаляем старые обработчики
+    document.removeEventListener('click', this.handleLinkClick);
+    window.removeEventListener('popstate', this.handlePopState);
+    window.removeEventListener('scroll', this.handleScroll);
+
+    // Создаем новые с привязкой контекста
+    this.handleLinkClick = this.handleLinkClick.bind(this);
+    this.handlePopState = this.handlePopState.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
+
+    // Добавляем обработчики
+    document.addEventListener('click', this.handleLinkClick);
+    window.addEventListener('popstate', this.handlePopState);
+    window.addEventListener('scroll', this.handleScroll);
   }
 
-  // ... остальные методы остаются без изменений ...
+  handleLinkClick(e) {
+    const link = e.target.closest('[data-router-link]');
+    if (link) {
+      e.preventDefault();
+      const path = link.getAttribute('href');
+      this.router.navigate(path);
+    }
+  }
+
+  handlePopState() {
+    this.router.resolve();
+  }
+
+  handleScroll() {
+    this.scrollHistory[this.currentPath] = window.scrollY;
+  }
+
+  destroy() {
+    // Очистка перед уничтожением
+    this.setupEventListeners(); // Удаляет все обработчики
+    if (this.router) this.router.destroy();
+    this.isInitialized = false;
+  }
 }
 
-// Инициализация с проверкой готовности DOM
-function initializeApp() {
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    window.appRouter = new SPARouter();
-  } else {
-    document.addEventListener('DOMContentLoaded', () => {
-      window.appRouter = new SPARouter();
-    });
-  }
-}
-
-initializeApp();
+// Инициализация
+document.addEventListener('DOMContentLoaded', () => {
+  window.appRouter = new SPARouter();
+});
 
 // Переинициализация для SPA
 window.reinitSPA = () => {

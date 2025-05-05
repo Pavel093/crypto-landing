@@ -10,15 +10,10 @@ function initAccordion() {
     container.classList.toggle('active');
   };
 
-  // Очистка старых обработчиков
   containers.forEach(c => {
     const header = c.querySelector('.header-accordion');
-    if (header) {
-      header.removeEventListener('click', handleClick);
-      header.addEventListener('click', handleClick);
-    }
+    header?.addEventListener('click', handleClick);
   });
 }
 
-window.initAccordion = initAccordion;
 document.addEventListener('DOMContentLoaded', initAccordion);

@@ -1,15 +1,14 @@
-// Объект для хранения состояния токеномики
 const TokenomicsManager = {
-    // Конфигурация
     config: {
-        stiffness: 0.05,
-        damping: 0.25,
+        stiffness: 0.1,
+        damping: 0.5,
         stickDistance: 15,
         hoverPadding: 25,
-        transitionDuration: 200
+        transitionDuration: 300,
+        smoothness: 0.2,
+        bottomRectanglesCount: 2
     },
 
-    // Данные
     data: [
         { category: "Public Sale", percentage: 30, tokens: "300,000,000" },
         { category: "Team & Advisors", percentage: 20, tokens: "200,000,000" },
@@ -19,12 +18,10 @@ const TokenomicsManager = {
         { category: "Ecosystem", percentage: 5, tokens: "50,000,000" }
     ],
 
-    // Состояние
     state: {
         tooltip: null,
         animationFrameId: null,
         currentActiveIndex: null,
-        isInitialized: false,
         elements: {
             chartContainer: null,
             rectangles: []
@@ -36,42 +33,26 @@ const TokenomicsManager = {
         }
     },
 
-    // Инициализация
     init() {
-        if (this.state.isInitialized) {
-            this.cleanup();
-        }
-
-        // Находим основные элементы
         this.state.elements.chartContainer = document.querySelector('.recharts-surface');
         if (!this.state.elements.chartContainer) return;
 
-        // Находим все видимые прямоугольники
         this.state.elements.rectangles = Array.from(document.querySelectorAll('.recharts-rectangle'))
             .filter(rect => {
                 const bounds = rect.getBoundingClientRect();
                 return bounds.width > 0 && bounds.height > 0;
             });
 
-        // Создаем tooltip
         this.createTooltip();
-
-        // Настраиваем обработчики событий
         this.setupEventListeners();
-
-        // Запускаем анимацию
         this.startAnimation();
-
-        this.state.isInitialized = true;
     },
 
-    // Создание tooltip
-    createTooltip() {
-        // Удаляем старый tooltip если есть
-        const oldTooltip = document.getElementById('custom-tooltip');
-        if (oldTooltip) oldTooltip.remove();
+    isMobile() {
+        return /Mobi|Android|iPad|iPhone/i.test(navigator.userAgent);
+    },
 
-        // Создаем новый
+    createTooltip() {
         const tooltip = document.createElement('div');
         tooltip.id = 'custom-tooltip';
         tooltip.className = 'custom-tooltip';
@@ -79,35 +60,83 @@ const TokenomicsManager = {
         tooltip.style.position = 'fixed';
         tooltip.style.pointerEvents = 'none';
         tooltip.style.zIndex = '1000';
+        tooltip.style.transition = `opacity ${this.config.transitionDuration}ms ease-out`;
         document.body.appendChild(tooltip);
 
         this.state.tooltip = tooltip;
     },
 
-    // Настройка обработчиков событий
     setupEventListeners() {
         const container = document.querySelector('.right-container') || this.state.elements.chartContainer;
         if (!container) return;
 
-        // Удаляем старые обработчики
-        container.removeEventListener('mousemove', this.handleMouseMove);
-        container.removeEventListener('mouseleave', this.handleMouseLeave);
-        window.removeEventListener('resize', this.handleResize);
+        if (this.isMobile()) {
+            container.addEventListener('click', this.handleTouchTap.bind(this));
+            document.addEventListener('click', this.handleOutsideTap.bind(this));
+        } else {
+            this.handleMouseMove = this.handleMouseMove.bind(this);
+            this.handleMouseLeave = this.handleMouseLeave.bind(this);
+            this.handleResize = this.handleResize.bind(this);
 
-        // Привязываем контекст
-        this.handleMouseMove = this.handleMouseMove.bind(this);
-        this.handleMouseLeave = this.handleMouseLeave.bind(this);
-        this.handleResize = this.handleResize.bind(this);
-
-        // Добавляем новые обработчики
-        container.addEventListener('mousemove', this.handleMouseMove);
-        container.addEventListener('mouseleave', this.handleMouseLeave);
-        window.addEventListener('resize', this.handleResize);
+            container.addEventListener('mousemove', this.handleMouseMove);
+            container.addEventListener('mouseleave', this.handleMouseLeave);
+            window.addEventListener('resize', this.handleResize);
+        }
     },
 
-    // Обработчики событий
+    handleTouchTap(e) {
+        const closest = this.findClosestRectangle(e.clientX, e.clientY);
+        if (closest) {
+            this.updateTooltipContent(closest.index);
+            this.state.currentActiveIndex = closest.index;
+    
+            const rect = closest.rect;
+            const tooltipWidth = this.state.tooltip.offsetWidth;
+            const tooltipHeight = this.state.tooltip.offsetHeight;
+    
+            const chartBounds = this.state.elements.chartContainer.getBoundingClientRect();
+    
+            // Центрируем по горизонтали
+            const targetX = chartBounds.left + (chartBounds.width - tooltipWidth) / 2;
+    
+            // Относительно нижней части прямоугольника
+            let targetY = rect.bottom + 10;
+    
+            // Не выходим за границы экрана
+            const maxY = chartBounds.bottom - tooltipHeight - 5;
+            const minY = chartBounds.top + 5;
+            targetY = Math.min(Math.max(targetY, minY), maxY);
+    
+            this.state.positions.target.x = targetX;
+            this.state.positions.target.y = targetY;
+    
+            this.showTooltip();
+        }
+    },
+
+    handleOutsideTap(e) {
+        if (!this.state.tooltip.contains(e.target) &&
+            !e.target.closest('.recharts-rectangle')) {
+            this.hideTooltip();
+            this.state.currentActiveIndex = null;
+        }
+    },
+
     handleMouseMove(e) {
         this.state.positions.lastMouse = { x: e.clientX, y: e.clientY };
+
+        if (!this.state.elements.chartContainer) {
+            this.hideTooltip();
+            return;
+        }
+
+        const svgBounds = this.state.elements.chartContainer.getBoundingClientRect();
+        if (e.clientX < svgBounds.left || e.clientX > svgBounds.right ||
+            e.clientY < svgBounds.top || e.clientY > svgBounds.bottom) {
+            this.hideTooltip();
+            return;
+        }
+
         this.updateTooltipTargetPosition(e);
     },
 
@@ -121,18 +150,16 @@ const TokenomicsManager = {
         }
     },
 
-    // Обновление позиции tooltip
     updateTooltipTargetPosition(e) {
         const closest = this.findClosestRectangle(e.clientX, e.clientY);
-        
+
         if (closest) {
-            this.handleRectangleHover(closest.index, closest.rect);
+            this.handleRectangleHover(closest.index, closest.rect, e);
         } else {
             this.handleNoRectangleHover(e);
         }
     },
 
-    // Поиск ближайшего прямоугольника
     findClosestRectangle(x, y) {
         let closestIndex = null;
         let minDistance = Infinity;
@@ -149,13 +176,13 @@ const TokenomicsManager = {
 
             if (x >= extendedBounds.left && x <= extendedBounds.right &&
                 y >= extendedBounds.top && y <= extendedBounds.bottom) {
-                
+
                 const center = {
                     x: bounds.left + bounds.width / 2,
                     y: bounds.top + bounds.height / 2
                 };
                 const distance = Math.sqrt(
-                    Math.pow(x - center.x, 2) + 
+                    Math.pow(x - center.x, 2) +
                     Math.pow(y - center.y, 2)
                 );
 
@@ -170,8 +197,7 @@ const TokenomicsManager = {
         return closestIndex !== null ? { index: closestIndex, rect: closestRect } : null;
     },
 
-    // Обработка наведения на прямоугольник
-    handleRectangleHover(index, rectBounds) {
+    handleRectangleHover(index, rectBounds, e) {
         if (this.state.tooltip.style.opacity === '0') {
             this.showTooltip();
         }
@@ -181,41 +207,28 @@ const TokenomicsManager = {
             this.state.currentActiveIndex = index;
         }
 
-        let targetX, targetY;
-
-        if (this.state.positions.lastMouse.x < rectBounds.left) {
-            targetX = rectBounds.left - this.config.stickDistance - this.state.tooltip.offsetWidth;
-        } else if (this.state.positions.lastMouse.x > rectBounds.right) {
-            targetX = rectBounds.right + this.config.stickDistance;
-        } else {
-            targetX = this.state.positions.lastMouse.x + 15;
-        }
-
-        targetY = rectBounds.top + (rectBounds.height / 2) - (this.state.tooltip.offsetHeight / 2);
-
-        // Корректировка у границ
+        const chartBounds = this.state.elements.chartContainer.getBoundingClientRect();
+        const chartCenterX = chartBounds.left + chartBounds.width / 2;
+        const isRightSide = e.clientX > chartCenterX;
         const tooltipWidth = this.state.tooltip.offsetWidth;
         const tooltipHeight = this.state.tooltip.offsetHeight;
-        const chartBounds = this.state.elements.chartContainer.getBoundingClientRect();
+        const isBottomRectangle = index >= this.state.elements.rectangles.length - this.config.bottomRectanglesCount;
 
-        if (targetX + tooltipWidth > chartBounds.right) {
-            targetX = chartBounds.right - tooltipWidth - 5;
-        }
-        if (targetX < chartBounds.left) {
-            targetX = chartBounds.left + 5;
-        }
+        let targetX = isRightSide
+            ? e.clientX - tooltipWidth - this.config.stickDistance
+            : e.clientX + this.config.stickDistance;
 
-        if (targetY + tooltipHeight > chartBounds.bottom) {
-            targetY = chartBounds.bottom - tooltipHeight - 5;
-        }
-        if (targetY < chartBounds.top) {
-            targetY = chartBounds.top + 5;
-        }
+        let targetY = isBottomRectangle
+            ? rectBounds.top - tooltipHeight - 5
+            : rectBounds.bottom + 5;
 
-        this.state.positions.target = { x: targetX, y: targetY };
+        targetX = Math.min(Math.max(targetX, chartBounds.left + 5), chartBounds.right - tooltipWidth - 5);
+        targetY = Math.min(Math.max(targetY, chartBounds.top + 5), chartBounds.bottom - tooltipHeight - 5);
+
+        this.state.positions.target.x += (targetX - this.state.positions.target.x) * this.config.smoothness;
+        this.state.positions.target.y += (targetY - this.state.positions.target.y) * this.config.smoothness;
     },
 
-    // Обработка когда курсор не над прямоугольником
     handleNoRectangleHover(e) {
         if (this.state.currentActiveIndex !== null) {
             const activeRect = this.state.elements.rectangles[this.state.currentActiveIndex];
@@ -233,18 +246,10 @@ const TokenomicsManager = {
             }
         }
 
-        const chartBounds = this.state.elements.chartContainer.getBoundingClientRect();
-        this.state.positions.target = {
-            x: Math.min(Math.max(e.clientX + 15, chartBounds.left + 5), chartBounds.right - this.state.tooltip.offsetWidth - 5),
-            y: Math.min(Math.max(e.clientY + 15, chartBounds.top + 5), chartBounds.bottom - this.state.tooltip.offsetHeight - 5)
-        };
+        this.hideTooltip();
     },
 
-    // Анимация
     startAnimation() {
-        if (this.state.animationFrameId) {
-            cancelAnimationFrame(this.state.animationFrameId);
-        }
         this.animateTooltip();
     },
 
@@ -252,28 +257,29 @@ const TokenomicsManager = {
         const dx = this.state.positions.target.x - this.state.positions.current.x;
         const dy = this.state.positions.target.y - this.state.positions.current.y;
 
-        this.state.positions.current.x += dx * this.config.stiffness;
-        this.state.positions.current.y += dy * this.config.damping;
+        if (Math.abs(dx) < 0.1 && Math.abs(dy) < 0.1) {
+            this.state.positions.current.x = this.state.positions.target.x;
+            this.state.positions.current.y = this.state.positions.target.y;
+        } else {
+            this.state.positions.current.x += dx * this.config.stiffness;
+            this.state.positions.current.y += dy * this.config.damping;
+        }
 
-        this.state.tooltip.style.left = this.state.positions.current.x + 'px';
-        this.state.tooltip.style.top = this.state.positions.current.y + 'px';
+        this.state.tooltip.style.left = Math.round(this.state.positions.current.x) + 'px';
+        this.state.tooltip.style.top = Math.round(this.state.positions.current.y) + 'px';
 
         this.state.animationFrameId = requestAnimationFrame(this.animateTooltip.bind(this));
     },
 
-    // Управление tooltip
     showTooltip() {
         this.state.tooltip.style.opacity = '1';
-        this.state.tooltip.style.transition = `opacity ${this.config.transitionDuration}ms ease-out`;
     },
 
     hideTooltip() {
         this.state.tooltip.style.opacity = '0';
-        this.state.tooltip.style.transition = `opacity ${this.config.transitionDuration}ms ease-out`;
         this.state.currentActiveIndex = null;
     },
 
-    // Обновление содержимого tooltip
     updateTooltipContent(index) {
         if (index === null || index >= this.data.length) return;
 
@@ -291,41 +297,6 @@ const TokenomicsManager = {
                 </div>
             </div>
         `;
-
-        this.state.tooltip.style.transition = `opacity ${this.config.transitionDuration}ms ease-out`;
-        this.state.tooltip.style.opacity = '0.8';
-        setTimeout(() => {
-            this.state.tooltip.style.opacity = '1';
-        }, this.config.transitionDuration / 2);
-    },
-
-    // Очистка
-    cleanup() {
-        if (this.state.animationFrameId) {
-            cancelAnimationFrame(this.state.animationFrameId);
-        }
-
-        const container = document.querySelector('.right-container') || this.state.elements.chartContainer;
-        if (container) {
-            container.removeEventListener('mousemove', this.handleMouseMove);
-            container.removeEventListener('mouseleave', this.handleMouseLeave);
-        }
-
-        window.removeEventListener('resize', this.handleResize);
-
-        if (this.state.tooltip && this.state.tooltip.parentNode) {
-            this.state.tooltip.parentNode.removeChild(this.state.tooltip);
-        }
-
-        this.state.isInitialized = false;
     }
 };
 
-// Инициализация при загрузке
-document.addEventListener('DOMContentLoaded', () => {
-    TokenomicsManager.init();
-});
-
-// Экспорт для SPA
-window.initTokenomics = () => TokenomicsManager.init();
-window.cleanupTokenomics = () => TokenomicsManager.cleanup();

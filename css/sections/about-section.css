@@ -49,6 +49,15 @@
     color: #0009;
 }
 
+.about-section {
+  visibility: hidden;
+}
+
+.about-section h2, 
+.about-section .container {
+  backface-visibility: hidden;
+}
+
 @media (max-width: 470px) {
     .about-section .container{
         width: 92%;
