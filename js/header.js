@@ -12,5 +12,3 @@ function initHeader() {
   handleScroll();
 }
 
-document.addEventListener('DOMContentLoaded', initHeader);
-

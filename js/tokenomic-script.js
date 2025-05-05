@@ -394,6 +394,10 @@ function adjustChartForMobile() {
     window.addEventListener('resize', handleResize);
     
     // Добавляем обработчик для случаев, когда график может быть динамически загружен
-    const observer = new MutationObserver(adjustChartForMobile);
-    observer.observe(document.body, { childList: true, subtree: true });
+    const observer = new MutationObserver(() => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(adjustChartForMobile, 100); // debounce внутри MutationObserver
+      });
+      observer.observe(document.body, { childList: true, subtree: true });
+      
   });
