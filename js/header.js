@@ -13,3 +13,4 @@ function initHeader() {
 }
 
 document.addEventListener('DOMContentLoaded', initHeader);
+

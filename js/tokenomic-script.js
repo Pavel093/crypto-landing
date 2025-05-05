@@ -300,3 +300,100 @@ const TokenomicsManager = {
     }
 };
 
+document.addEventListener('DOMContentLoaded', () => {
+    TokenomicsManager.init();
+});
+
+function adjustChartForMobile() {
+    const svgContainer = document.querySelector('.right-container');
+    if (!svgContainer) return;
+  
+    const isMobile = window.innerWidth <= 770;
+    const bars = document.querySelectorAll('.recharts-bar-rectangle path');
+    const labels = document.querySelectorAll('.recharts-label-list text');
+    const clipPath = document.querySelector('#recharts1-clip rect');
+  
+    // Сохраняем оригинальные значения
+    if (!window.originalBarValues) {
+      window.originalBarValues = {
+        paths: Array.from(bars).map(bar => bar.getAttribute('d')),
+        labels: Array.from(labels).map(label => ({
+          x: label.getAttribute('x'),
+          text: label.querySelector('tspan').textContent
+        })),
+        clipPathWidth: clipPath ? clipPath.getAttribute('width') : null
+      };
+    }
+  
+    if (isMobile) {
+      // Мобильная версия - уменьшаем ширину на 20%
+      bars.forEach((bar, index) => {
+        const originalPath = window.originalBarValues.paths[index];
+        
+        // Парсим path с помощью регулярного выражения
+        const pathParts = originalPath.match(/M(\d+),(\d+)L (\d+),(\d+)([^Z]*)Z/);
+        if (!pathParts) return;
+        
+        const startX = parseFloat(pathParts[1]);
+        const startY = parseFloat(pathParts[2]);
+        const endX = parseFloat(pathParts[3]);
+        const endY = parseFloat(pathParts[4]);
+        const arcs = pathParts[5];
+        
+        // Вычисляем новую ширину
+        const originalWidth = endX - startX;
+        const newWidth = originalWidth * 0.8;
+        const newEndX = startX + newWidth;
+        
+        // Собираем новый path
+        const newPath = `M${startX},${startY}L${newEndX},${endY}${arcs}Z`;
+        bar.setAttribute('d', newPath);
+      });
+  
+      // Корректируем позиции меток
+      labels.forEach((label, index) => {
+        const originalX = parseFloat(window.originalBarValues.labels[index].x);
+        const scaledX = 172 + (originalX - 172) * 0.8;
+        label.setAttribute('x', scaledX);
+      });
+  
+      // Корректируем clipPath
+      if (clipPath) {
+        clipPath.setAttribute('width', parseFloat(window.originalBarValues.clipPathWidth) * 0.8);
+      }
+    } else {
+      // Десктопная версия - возвращаем оригинальные значения
+      bars.forEach((bar, index) => {
+        bar.setAttribute('d', window.originalBarValues.paths[index]);
+      });
+  
+      labels.forEach((label, index) => {
+        label.setAttribute('x', window.originalBarValues.labels[index].x);
+        label.querySelector('tspan').textContent = window.originalBarValues.labels[index].text;
+      });
+  
+      if (clipPath) {
+        clipPath.setAttribute('width', window.originalBarValues.clipPathWidth);
+      }
+    }
+  }
+  
+  // Добавляем debounce для оптимизации
+  let resizeTimeout;
+  function handleResize() {
+    clearTimeout(resizeTimeout);
+    resizeTimeout = setTimeout(adjustChartForMobile, 100);
+  }
+  
+  // Инициализация
+  document.addEventListener('DOMContentLoaded', () => {
+    // Запускаем сразу после загрузки DOM
+    adjustChartForMobile();
+    
+    // Добавляем обработчик resize
+    window.addEventListener('resize', handleResize);
+    
+    // Добавляем обработчик для случаев, когда график может быть динамически загружен
+    const observer = new MutationObserver(adjustChartForMobile);
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
